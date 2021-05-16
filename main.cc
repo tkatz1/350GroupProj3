@@ -15,12 +15,13 @@ void * reader(void * arg)
 
   pthread_mutex_lock(&mutex);             //get exclusive access to rc
     rc = rc + 1;            //one more reader now
-    printf("rc: %d\n", rc);
     if(rc == 1) pthread_mutex_lock(&db);  //if this is the first reader ...
   pthread_mutex_unlock(&mutex);           //release exclusive access to rc
                             //”i” → thread num [1..10] passed from main
 
   printf("Reader %d in critical section\n", i);
+
+  printf("Reading database... value is %d\n", database);
   pthread_mutex_lock(&mutex);             //get exclusive access to rc
     rc = rc - 1;              //one reader fewer now
     if(rc == 0) pthread_mutex_unlock(&db);  //if the last reader ..
@@ -35,11 +36,8 @@ void * writer(void * arg)
   printf("Writer tries to enter the critical section\n");
   pthread_mutex_lock(&db);                  //get exclusive access
     printf("Writer is in critical region\n");
-
-    printf("1still in critical region\n");
-    printf("2still in critical region\n");
-    printf("3still in critical region\n");
-    printf("4still in critical region\n");
+    database = 1;
+    printf("Writing to database... value is %d\n", database);
   pthread_mutex_unlock(&db);                //release exclusive access
   printf("Writer is in non-critical region\n");
 
@@ -49,7 +47,6 @@ void * writer(void * arg)
 
 
 int main(){
-
   pthread_t r[9];
   pthread_t w;
 
